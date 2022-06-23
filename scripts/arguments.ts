@@ -1,0 +1,1 @@
+module.exports = ["Encode Club Dinner", "ECD"];
