@@ -12,6 +12,7 @@ contract NftTicket is ERC721, Ownable, ReentrancyGuard {
     uint256 public tokenId;
     string public baseURISet;
     struct TicketCategory {
+        bytes32 categoryName;
         uint256 ticketPrice;
         uint256 maxNoOfTickets;
         uint256 numberOfTicketsBought;
@@ -21,6 +22,8 @@ contract NftTicket is ERC721, Ownable, ReentrancyGuard {
         bytes32 eventDate;
         bytes32 eventTime;
     }
+    event BuyTicket (address indexed _buyer, bytes32 _ticketCategory);
+    event CheckIn (address indexed _attendee, bool checkedIn);
     EventDetails public eventDetails;
     mapping(address => bool) public checkedIn;
     mapping(address => bool) public hasBoughtTicket;
@@ -55,6 +58,7 @@ contract NftTicket is ERC721, Ownable, ReentrancyGuard {
         uint256 _numberOfTicketsBought
     ) public onlyOwner {
         ticketCategoryMapping[_name] = TicketCategory({
+            categoryName: _name,
             ticketPrice: _ticketPrice,
             maxNoOfTickets: _maxNoOfTickets,
             numberOfTicketsBought: _numberOfTicketsBought
@@ -63,8 +67,13 @@ contract NftTicket is ERC721, Ownable, ReentrancyGuard {
     }
 
     // TODO: Consider removing
-    function getTicketCategoryArraySize() public view returns (uint256 size) {
-        size = ticketCategoryArray.length;
+    // function getTicketCategoryArraySize() public view returns (uint256 size) {
+    //     size = ticketCategoryArray.length;
+    // }
+
+    /// @dev To test on bsc testnet if this works
+    function getTicketCategoryArraySize() public view returns (uint) {
+        return ticketCategoryArray.length;
     }
 
     /**
@@ -85,6 +94,7 @@ contract NftTicket is ERC721, Ownable, ReentrancyGuard {
         ticketCategoryBuying.numberOfTicketsBought +=1;
         tokenId++;
         _safeMint(msg.sender, tokenId);
+        emit BuyTicket(msg.sender, _ticketCategory);
     }
 
     /**
@@ -92,6 +102,7 @@ contract NftTicket is ERC721, Ownable, ReentrancyGuard {
     */
     function checkAttendeeIn(address _attendeeAddress) public onlyOwner {
         checkedIn[_attendeeAddress] = true;
+        emit CheckIn(_attendeeAddress, checkedIn[_attendeeAddress]);
     }
 
     /**
