@@ -116,6 +116,7 @@ describe("Interaction with nftTicket", () => {
       await tx2.wait();
 
       const arrayLengthExpected = await nftTicketContract.getTicketCategoryArraySize();
+      console.log(`Array Length: ${arrayLengthExpected}`);
       expect(arrayLengthExpected).to.eq("2");
     });
   });
@@ -155,15 +156,49 @@ describe("Interaction with nftTicket", () => {
     it("Should allow minting only with correct price", async () => {
       const buyer = accounts[1];
       // const ticketCategoryBytes32
-      const tx = await
+      const tx1 = await
         nftTicketContract.connect(buyer).buyTicket(
           ticketCategoryNameBytes32,
           { value: ethers.utils.parseEther(ticketPriceSetVIP.toString()) }
         );
-      await tx.wait();
+      await tx1.wait();
       const numberOfTicketOwnedByBuyerExpected = await nftTicketContract.balanceOf(buyer.address);
       expect(numberOfTicketOwnedByBuyerExpected).to.eq(1);
     });
+    it("Should update the number of tickets bought correctly", async () => {
+      const buyer = accounts[1];
+      // const ticketCategoryBytes32
+      const tx1 = await nftTicketContract
+        .connect(buyer)
+        .buyTicket(ticketCategoryNameBytes32, {
+          value: ethers.utils.parseEther(ticketPriceSetVIP.toString()),
+        });
+      await tx1.wait();
+      const numberOfTicketOwnedByBuyerExpected =
+        await nftTicketContract.balanceOf(buyer.address);
+      expect(numberOfTicketOwnedByBuyerExpected).to.eq(1);
+      let ticketCategoryExpected =
+        await nftTicketContract.ticketCategoryMapping(
+          ticketCategoryNameBytes32
+        );
+      let numberOfTicketsBoughtExpected =
+        await ticketCategoryExpected.numberOfTicketsBought;
+      expect(numberOfTicketsBoughtExpected).to.eq(1);
+      const buyer2 = accounts[2];
+      const tx2 = await nftTicketContract
+        .connect(buyer2)
+        .buyTicket(ticketCategoryNameBytes32, {
+          value: ethers.utils.parseEther(ticketPriceSetVIP.toString()),
+        });
+      await tx2.wait();
+      ticketCategoryExpected = await nftTicketContract.ticketCategoryMapping(
+        ticketCategoryNameBytes32
+      );
+      numberOfTicketsBoughtExpected =
+        await ticketCategoryExpected.numberOfTicketsBought;
+      expect(numberOfTicketsBoughtExpected).to.eq(2);
+      console.log(`Number of tickets bought: ${numberOfTicketsBoughtExpected}`);
+    })
     it("Should not allow transfer of tickets bought", async () => {
       const buyer = accounts[1];
       // const ticketCategoryBytes32
