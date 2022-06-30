@@ -15,7 +15,9 @@ async function main() {
 
   console.log(`Using address ${wallet.address}`);
 
-  const provider = new ethers.providers.JsonRpcProvider(process.env.GOERLI_URL);
+  const provider = new ethers.providers.JsonRpcProvider(
+    process.env.BSC_TESTNET_URL
+  );
   const signer = wallet.connect(provider);
 
   console.log("Deploying NftTicket contract");
