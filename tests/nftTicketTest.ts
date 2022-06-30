@@ -47,6 +47,7 @@ describe("Interaction with nftTicket", () => {
       const ticketCategoryNameBytes32 = ethers.utils.formatBytes32String(
         ticketCategoryNameVIP
       );
+      console.log(`VIP Bytes32: ${ticketCategoryNameBytes32}`);
       const ticketPriceSetVIPBN = ethers.utils.parseEther(
         ticketPriceSetVIP.toString()
       );
